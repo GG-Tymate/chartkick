@@ -512,7 +512,7 @@
     renderLineChart = function (element, series, opts) {
       waitForLoaded(function () {
         var options = jsOptions(series, opts);
-        var data = createDataTable(series, "datetime");
+        var data = createDataTable(series, (opts['key_type'] && opts['key_type'] == "string") ? "string" : "datetime");
         var chart = new google.visualization.LineChart(element);
         resize(function () {
           chart.draw(data, options);
@@ -611,10 +611,16 @@
       r = [];
       for (j = 0; j < data.length; j++) {
         key = data[j][0];
-        key = time ? toDate(key) : toStr(key);
+        if (opts['key_type'] && opts['key_type'] == 'string'){
+          key = toStr(key);
+        }
+        else{
+          key = time ? toDate(key) : toStr(key);
+        }
+
         r.push([key, toFloat(data[j][1])]);
       }
-      if (time) {
+      if (time && (opts['key_type'] == undefined || opts['key_type'] != 'string')) {
         r.sort(sortByTime);
       }
       series[i].data = r;
